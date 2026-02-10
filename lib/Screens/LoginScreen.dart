@@ -16,6 +16,15 @@ class _LoginscreenState extends State<Loginscreen> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
+  // Navigator.pushNamed(
+  //   context,
+  //   '/second',
+  //   arguments: 'Ciao dalla prima schermata', // Dato passato
+  // );
+
+  // recupero argomenti
+  //final String args = ModalRoute.of(context)!.settings.arguments as String;
+
   @override
   void dispose() {
     _usernameController.dispose();
