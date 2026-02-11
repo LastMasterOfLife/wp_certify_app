@@ -16,12 +16,17 @@ class _WebscreenState extends State<Webscreen> {
   void initState() {
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://app.cer-tify.eu/login'));
+      ..loadRequest(Uri.parse('https://www.google.com/?hl=it'));
     super.initState();
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    var url = args['url'];
+    print("args: $args");
+    print("url_args: $url");
+
     return Scaffold(
       appBar: AppBar(
         title: Text("WebView"),

@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../Widgets/Neumorfic_widget.dart';
@@ -16,14 +18,31 @@ class _LoginscreenState extends State<Loginscreen> {
   bool _obscurePassword = true;
   bool _rememberMe = false;
 
-  // Navigator.pushNamed(
-  //   context,
-  //   '/second',
-  //   arguments: 'Ciao dalla prima schermata', // Dato passato
-  // );
+  late var token = "";
+  late var url = "";
 
-  // recupero argomenti
-  //final String args = ModalRoute.of(context)!.settings.arguments as String;
+  void postData(user, pass) async {
+    var dio = Dio();
+
+    try {
+      Response response = await dio.post("path", data: {
+        "username" : user,
+        "password" : pass
+      });
+
+      print(response.data);
+      print(response.statusCode);
+      print(response.headers);
+
+      if (response.statusCode == 200){
+        token = response.data['token'];
+        url = response.data['url'];
+      }
+
+    }catch (e){
+      print(e);
+    }
+  }
 
   @override
   void dispose() {
@@ -226,10 +245,15 @@ class _LoginscreenState extends State<Loginscreen> {
                   borderRadius: 12,
                   backgroundColor: const Color(0xFFECF0F3),
                   onTap: () {
-                    Navigator.pushNamed(context, "/web");
                     print('Login pressed');
                     print('Username: ${_usernameController.text}');
                     print('Password: ${_passwordController.text}');
+                    setState(() {
+                      postData(_usernameController.text, _passwordController.text);
+                    });
+                    print('Api success');
+                    Navigator.pushNamed(context, "/web", arguments: {'url': url});
+
                   },
                   child: const Center(
                     child: Text(
