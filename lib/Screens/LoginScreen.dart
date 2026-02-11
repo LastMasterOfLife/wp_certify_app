@@ -21,26 +21,33 @@ class _LoginscreenState extends State<Loginscreen> {
   late var token = "";
   late var url = "";
 
-  void postData(user, pass) async {
+  void postData(String user, String pass, BuildContext context) async {
     var dio = Dio();
 
     try {
-      Response response = await dio.post("path", data: {
-        "username" : user,
-        "password" : pass
+
+      Response response = await dio.post("http://10.0.2.2:8000/api/v1/login", data: {
+        "username": user,
+        "password": pass
       });
 
-      print(response.data);
-      print(response.statusCode);
-      print(response.headers);
+      if (response.statusCode == 200) {
 
-      if (response.statusCode == 200){
-        token = response.data['token'];
-        url = response.data['url'];
+        print('response $response');
+        final String tokenOttenuto = response.data['token'];
+        final String urlOttenuta = response.data['url'];
+
+        if (context.mounted) {
+          Navigator.pushNamed(
+            context,
+            '/web',
+            arguments: {'url': urlOttenuta},
+          );
+        }
       }
+    } catch (e) {
+      print("Errore durante il login: $e");
 
-    }catch (e){
-      print(e);
     }
   }
 
@@ -245,15 +252,12 @@ class _LoginscreenState extends State<Loginscreen> {
                   borderRadius: 12,
                   backgroundColor: const Color(0xFFECF0F3),
                   onTap: () {
-                    print('Login pressed');
-                    print('Username: ${_usernameController.text}');
-                    print('Password: ${_passwordController.text}');
-                    setState(() {
-                      postData(_usernameController.text, _passwordController.text);
-                    });
-                    print('Api success');
-                    Navigator.pushNamed(context, "/web", arguments: {'url': url});
+                    String user = _usernameController.text.trim();
+                    String pass = _passwordController.text.trim();
 
+                    if (user.isNotEmpty && pass.isNotEmpty) {
+                      postData(user, pass, context);
+                    }
                   },
                   child: const Center(
                     child: Text(

@@ -11,27 +11,33 @@ class Webscreen extends StatefulWidget {
 class _WebscreenState extends State<Webscreen> {
 
   late final WebViewController _controller;
+  bool _isInitialized = false;
 
   @override
-  void initState() {
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://www.google.com/?hl=it'));
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_isInitialized) {
+      final Map<String, dynamic> args =
+      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+
+      final String urlDaCaricare = args['url'] ?? 'https://www.google.com';
+
+      _controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(Uri.parse(urlDaCaricare));
+
+      _isInitialized = true;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    var url = args['url'];
-    print("args: $args");
-    print("url_args: $url");
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text("WebView"),
+      appBar: AppBar(title: const Text("WebView")),
+      body: SafeArea(
+        child: WebViewWidget(controller: _controller),
       ),
-      body: SafeArea(child: WebViewWidget(controller: _controller)),
     );
   }
 }
