@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wp_app/colors.dart';
 
 /// Widget con Drop Shadow (ombra esterna)
 class DropShadowWidget extends StatelessWidget {
@@ -17,8 +18,8 @@ class DropShadowWidget extends StatelessWidget {
     this.width = 150,
     this.height = 150,
     this.borderRadius = 30,
-    this.backgroundColor = const Color(0xFFECF0F3),
-    this.shadowColor = const Color(0xFFD1D9E6),
+    this.backgroundColor = background_color,
+    this.shadowColor = shadow_color,
     this.blurRadius = 30,
     this.offset = const Offset(18, 18),
   }) : super(key: key);
@@ -61,8 +62,8 @@ class InnerShadowWidget1 extends StatelessWidget {
     this.width = 150,
     this.height = 150,
     this.borderRadius = 30,
-    this.backgroundColor = const Color(0xFFECF0F3),
-    this.shadowColor = const Color(0xFFD1D9E6),
+    this.backgroundColor = background_color,
+    this.shadowColor = shadow_color,
     this.blurRadius = 30,
     this.offset = const Offset(18, 18),
   }) : super(key: key);
@@ -111,8 +112,8 @@ class InnerShadowWidget2 extends StatelessWidget {
     Key? key,
     this.child,
     this.size = 150,
-    this.backgroundColor = const Color(0xFFECF0F3),
-    this.shadowColor = const Color(0xFFFFFFFF),
+    this.backgroundColor = background_color,
+    this.shadowColor = shadow_color,
     this.blurRadius = 30,
     this.offset = const Offset(-18, -18),
   }) : super(key: key);
@@ -250,7 +251,7 @@ class NeumorphicWidget extends StatelessWidget {
     this.width = 150,
     this.height = 150,
     this.borderRadius = 30,
-    this.backgroundColor = const Color(0xFFECF0F3),
+    this.backgroundColor = background_color,
     this.isPressed = false,
     this.isCircular = false,
   }) : super(key: key);
@@ -300,7 +301,7 @@ class NeumorphicButton extends StatefulWidget {
     this.width = 150,
     this.height = 150,
     this.borderRadius = 30,
-    this.backgroundColor = const Color(0xFFECF0F3),
+    this.backgroundColor = background_color,
     this.onTap,
     this.isCircular = false,
   }) : super(key: key);

@@ -1,122 +1,26 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../Widgets/Neumorfic_widget.dart';
-import '../api_urls.dart';
-import 'package:wp_app/colors.dart';
+import '../colors.dart';
 
-class Loginscreen extends StatefulWidget {
-  const Loginscreen({super.key});
+class Signupscreen extends StatefulWidget {
+  const Signupscreen({super.key});
 
   @override
-  State<Loginscreen> createState() => _LoginscreenState();
+  State<Signupscreen> createState() => _SignupscreenState();
 }
 
-class _LoginscreenState extends State<Loginscreen> {
+class _SignupscreenState extends State<Signupscreen> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _rememberMe = false;
-  String _locationMessage = "Posizione non rilevata";
-  bool _error_login = false;
 
 
-  late var token = "";
-  late var url = "";
 
-  void postData(String user, String pass, BuildContext context) async {
-    var dio = Dio();
-
-    try {
-      Response response = await dio.post(url_login, data: {
-        "username": user,
-        "password": pass
-      });
-
-      if (response.statusCode == 200) {
-        setState(() => _error_login = false);
-        final String urlOttenuta = response.data['url'];
-
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, '/web', arguments: {'url': urlOttenuta});
-        }
-      }
-    } on DioException catch (e) {
-      setState(() => _error_login = true);
-
-      String messaggio = "Errore di connessione";
-      if (e.response?.statusCode == 401) {
-        messaggio = "Username o Password errati";
-      }
-
-      //if (context.mounted) {
-      //  ScaffoldMessenger.of(context).showSnackBar(
-      //    SnackBar(content: Text(messaggio), backgroundColor: Colors.redAccent),
-      //  );
-      //}
-    } catch (e) {
-      setState(() => _error_login = true);
-    }
-  }
-
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-
-    if (!serviceEnabled) {
-      setState(() => _locationMessage = 'Servizio posizione disabilitato');
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() => _locationMessage = 'Permessi negati');
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      setState(() => _locationMessage = 'Permessi negati permanentemente');
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-
-    setState(() {
-      _locationMessage =
-      "Lat: ${position.latitude}, Long: ${position.longitude}";
-      print("Lat: ${position.latitude}, Long: ${position.longitude}");
-    });
-
-
-  }
-
-
-  @override
-  void initState() {
-    _getCurrentLocation();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: background_color,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -125,8 +29,7 @@ class _LoginscreenState extends State<Loginscreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
-
+                const SizedBox(height: 20),
                 // Header con logo
                 Center(
                   child: Column(
@@ -140,7 +43,7 @@ class _LoginscreenState extends State<Loginscreen> {
                         offset: const Offset(10, 10),
                         child: Center(
                           child: Icon(
-                            Icons.fingerprint,
+                            Icons.person_add_alt_rounded,
                             size: 50,
                             color: Colors.blue.shade300,
                           ),
@@ -148,7 +51,7 @@ class _LoginscreenState extends State<Loginscreen> {
                       ),
                       const SizedBox(height: 30),
                       const Text(
-                        'Login',
+                        'Sign Up',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w600,
@@ -159,7 +62,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 50),
+                const SizedBox(height: 90),
 
                 // Username Field
                 InnerShadowWidget1(
@@ -246,68 +149,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                if (_error_login)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8.0, left: 8.0),
-                    child: Text(
-                      "Credenziali non valide",
-                      style: TextStyle(color: Colors.redAccent, fontSize: 12),
-                    ),
-                  ),
-
-                SizedBox(height: 15),
-
-                // Remember me checkbox
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _rememberMe = !_rememberMe;
-                        });
-                      },
-                      child: NeumorphicWidget(
-                        width: 24,
-                        height: 24,
-                        borderRadius: 6,
-                        backgroundColor: background_color,
-                        isPressed: _rememberMe,
-                        child: _rememberMe
-                            ? const Center(
-                          child: Icon(
-                            Icons.check,
-                            size: 16,
-                            color: header_color,
-                          ),
-                        )
-                            : null,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Remember me',
-                      style: TextStyle(
-                        color: imput_border,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {
-                        print('Forgot password');
-                      },
-                      child: Text(
-                        'Forgot password?',
-                        style: TextStyle(
-                          color: Colors.blue.shade400,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 35),
+                const SizedBox(height: 30),
 
                 // Login Button
                 NeumorphicButton(
@@ -319,12 +161,12 @@ class _LoginscreenState extends State<Loginscreen> {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
                     if (user.isNotEmpty && pass.isNotEmpty) {
-                      postData(user, pass, context);
+                      //postData(user, pass, context);
                     }
                   },
                   child: const Center(
                     child: Text(
-                      'Login',
+                      'Sign Up',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -366,36 +208,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ],
                 ),
 
-                const SizedBox(height: 30),
-
-                // Social buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildSocialButton(
-                      icon: Icons.g_mobiledata,
-                      color: Colors.red.shade400,
-                      size: 38,
-                      onTap: () => print('Google login'),
-                    ),
-                    const SizedBox(width: 15),
-                    _buildSocialButton(
-                      icon: Icons.facebook,
-                      color: Colors.blue.shade700,
-                      size: 32,
-                      onTap: () => print('Facebook login'),
-                    ),
-                    const SizedBox(width: 15),
-                    _buildSocialButton(
-                      icon: Icons.apple,
-                      color: apple_social_color,
-                      size: 32,
-                      onTap: () => print('Apple login'),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 30),
+                const SizedBox(height: 60),
 
                 // Sign up link
                 Center(
@@ -403,7 +216,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
-                        "Don't have an account? ",
+                        "You already have an account! ",
                         style: TextStyle(
                           color: imput_border,
                           fontSize: 14,
@@ -411,8 +224,8 @@ class _LoginscreenState extends State<Loginscreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          print('Sign Up pressed');
-                          Navigator.pushNamed(context, "/signup");
+                          print('Login pressed');
+                          Navigator.pushNamed(context, "/");
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
@@ -420,7 +233,7 @@ class _LoginscreenState extends State<Loginscreen> {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
-                          'Sign Up',
+                          'Login',
                           style: TextStyle(
                             color: Colors.blue.shade400,
                             fontSize: 14,
@@ -432,31 +245,10 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 20),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
-    required double size,
-    required VoidCallback onTap,
-  }) {
-    return NeumorphicButton(
-      width: 55,
-      height: 55,
-      isCircular: true,
-      backgroundColor: background_color,
-      onTap: onTap,
-      child: Center(
-        child: Icon(
-          icon,
-          size: size,
-          color: color,
         ),
       ),
     );
