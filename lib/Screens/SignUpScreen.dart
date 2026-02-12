@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:wp_app/api_urls.dart';
 import '../Widgets/Neumorfic_widget.dart';
 import '../colors.dart';
 
@@ -14,9 +16,52 @@ class _SignupscreenState extends State<Signupscreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _error_login = false;
+  late var token = "";
+  late var url = "";
 
+  void postData(String user, String pass, BuildContext context) async {
+    String messaggio = "";
+    var dio = Dio();
 
+    try {
+      Response response = await dio.post(url_signup, data: {
+        "username": user,
+        "password": pass
+      });
 
+      if (response.statusCode == 200) {
+        setState(() => _error_login = false);
+        if (context.mounted) {
+          Navigator.pushNamed(context, '/'); // da capire perchè non torna al login
+        }
+      }
+
+      messaggio = "Utente creato con successo";
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(messaggio), backgroundColor: Colors.green),
+        );
+      }
+
+    } on DioException catch (e) {
+      setState(() => _error_login = true);
+
+      messaggio = "Errore di connessione";
+      if (e.response?.statusCode == 401) {
+        messaggio = "Username o Password non conformi";
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(messaggio), backgroundColor: Colors.redAccent),
+        );
+      }
+    } catch (e) {
+      setState(() => _error_login = true);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +196,7 @@ class _SignupscreenState extends State<Signupscreen> {
 
                 const SizedBox(height: 30),
 
-                // Login Button
+                // Sign Up Button
                 NeumorphicButton(
                   width: double.infinity,
                   height: 55,
@@ -161,7 +206,7 @@ class _SignupscreenState extends State<Signupscreen> {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
                     if (user.isNotEmpty && pass.isNotEmpty) {
-                      //postData(user, pass, context);
+                      postData(user, pass, context);
                     }
                   },
                   child: const Center(
@@ -210,7 +255,7 @@ class _SignupscreenState extends State<Signupscreen> {
 
                 const SizedBox(height: 60),
 
-                // Sign up link
+                // Login link
                 Center(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
