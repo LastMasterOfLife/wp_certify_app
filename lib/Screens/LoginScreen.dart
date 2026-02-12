@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import 'package:geolocator/geolocator.dart';
 import '../Widgets/Neumorfic_widget.dart';
+import '../api_urls.dart';
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -17,6 +18,9 @@ class _LoginscreenState extends State<Loginscreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  String _locationMessage = "Posizione non rilevata";
+  bool _error_login = false;
+
 
   late var token = "";
   late var url = "";
@@ -25,30 +29,80 @@ class _LoginscreenState extends State<Loginscreen> {
     var dio = Dio();
 
     try {
-
-      Response response = await dio.post("http://10.0.2.2:8000/api/v1/login", data: {
+      Response response = await dio.post(url_login, data: {
         "username": user,
         "password": pass
       });
 
       if (response.statusCode == 200) {
-
-        print('response $response');
-        final String tokenOttenuto = response.data['token'];
+        setState(() => _error_login = false);
         final String urlOttenuta = response.data['url'];
 
         if (context.mounted) {
-          Navigator.pushNamed(
-            context,
-            '/web',
-            arguments: {'url': urlOttenuta},
-          );
+          Navigator.pushReplacementNamed(context, '/web', arguments: {'url': urlOttenuta});
         }
       }
-    } catch (e) {
-      print("Errore durante il login: $e");
+    } on DioException catch (e) {
+      setState(() => _error_login = true);
 
+      String messaggio = "Errore di connessione";
+      if (e.response?.statusCode == 401) {
+        messaggio = "Username o Password errati";
+      }
+
+      //if (context.mounted) {
+      //  ScaffoldMessenger.of(context).showSnackBar(
+      //    SnackBar(content: Text(messaggio), backgroundColor: Colors.redAccent),
+      //  );
+      //}
+    } catch (e) {
+      setState(() => _error_login = true);
     }
+  }
+
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+    if (!serviceEnabled) {
+      setState(() => _locationMessage = 'Servizio posizione disabilitato');
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() => _locationMessage = 'Permessi negati');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() => _locationMessage = 'Permessi negati permanentemente');
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    setState(() {
+      _locationMessage =
+      "Lat: ${position.latitude}, Long: ${position.longitude}";
+      print("Lat: ${position.latitude}, Long: ${position.longitude}");
+    });
+
+
+  }
+
+
+  @override
+  void initState() {
+    _getCurrentLocation();
+    super.initState();
   }
 
   @override
@@ -191,7 +245,16 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                const SizedBox(height: 15),
+                if (_error_login)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8.0, left: 8.0),
+                    child: Text(
+                      "Credenziali non valide",
+                      style: TextStyle(color: Colors.redAccent, fontSize: 12),
+                    ),
+                  ),
+
+                SizedBox(height: 15),
 
                 // Remember me checkbox
                 Row(
@@ -254,7 +317,6 @@ class _LoginscreenState extends State<Loginscreen> {
                   onTap: () {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
-
                     if (user.isNotEmpty && pass.isNotEmpty) {
                       postData(user, pass, context);
                     }
@@ -349,7 +411,7 @@ class _LoginscreenState extends State<Loginscreen> {
                       TextButton(
                         onPressed: () {
                           print('Sign Up pressed');
-                          Navigator.pushNamed(context, "/geo");
+                          //Navigator.pushNamed(context, "/geo");
                         },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,

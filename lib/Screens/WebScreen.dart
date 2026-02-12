@@ -34,7 +34,6 @@ class _WebscreenState extends State<Webscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("WebView")),
       body: SafeArea(
         child: WebViewWidget(controller: _controller),
       ),
