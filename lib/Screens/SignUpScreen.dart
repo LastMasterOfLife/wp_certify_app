@@ -30,10 +30,10 @@ class _SignupscreenState extends State<Signupscreen> {
         "password": pass
       });
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         setState(() => _error_login = false);
         if (context.mounted) {
-          Navigator.pushNamed(context, '/'); // da capire perchè non torna al login
+          Navigator.pushNamed(context, '/');
         }
       }
 

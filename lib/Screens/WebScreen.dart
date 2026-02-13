@@ -1,10 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../Services/LocationService.dart';
 
 class Webscreen extends StatefulWidget {
   const Webscreen({super.key});
@@ -17,7 +13,6 @@ class _WebscreenState extends State<Webscreen> {
 
   late final WebViewController _controller;
   bool _isInitialized = false;
-
 
   @override
   void didChangeDependencies() {
