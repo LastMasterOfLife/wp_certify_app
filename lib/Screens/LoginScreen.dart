@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import '../Services/LocationService.dart';
 import '../Widgets/Neumorfic_widget.dart';
 import '../api_urls.dart';
 import 'package:wp_app/colors.dart';
@@ -21,7 +23,9 @@ class _LoginscreenState extends State<Loginscreen> {
   bool _rememberMe = false;
   String _locationMessage = "Posizione non rilevata";
   bool _error_login = false;
-
+  StreamSubscription<Position>? _positionSubscription;
+  Position? _currentPosition;
+  Timer? positionTimer;
 
   late var token = "";
   late var url = "";
@@ -61,48 +65,25 @@ class _LoginscreenState extends State<Loginscreen> {
     }
   }
 
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  void _startListening() async {
 
+    bool hasPermission = await LocationService().checkPermissions();
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (hasPermission) {
 
-    if (!serviceEnabled) {
-      setState(() => _locationMessage = 'Servizio posizione disabilitato');
-      return;
+      Position? position = await Geolocator.getLastKnownPosition();
+
+      positionTimer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
+        print("timer -> Lat: ${position!.latitude}, Lon: ${position
+            .longitude}, alt: ${position.altitude}, accuracy: ${position
+            .accuracy}");
+      });
     }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() => _locationMessage = 'Permessi negati');
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      setState(() => _locationMessage = 'Permessi negati permanentemente');
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-
-    setState(() {
-      _locationMessage =
-      "Lat: ${position.latitude}, Long: ${position.longitude}";
-      print("Lat: ${position.latitude}, Long: ${position.longitude}");
-    });
-
-
   }
-
 
   @override
   void initState() {
-    _getCurrentLocation();
+    _startListening();
     super.initState();
   }
 
@@ -110,8 +91,10 @@ class _LoginscreenState extends State<Loginscreen> {
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _positionSubscription?.cancel();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import '../Services/LocationService.dart';
 
 class Webscreen extends StatefulWidget {
   const Webscreen({super.key});
@@ -13,13 +18,18 @@ class _WebscreenState extends State<Webscreen> {
   late final WebViewController _controller;
   bool _isInitialized = false;
 
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     if (!_isInitialized) {
       final Map<String, dynamic> args =
-      ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      ModalRoute
+          .of(context)!
+          .settings
+          .arguments as Map<String, dynamic>;
+
 
       final String urlDaCaricare = args['url'] ?? 'https://www.google.com';
 
@@ -29,6 +39,11 @@ class _WebscreenState extends State<Webscreen> {
 
       _isInitialized = true;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override

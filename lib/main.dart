@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wp_app/Screens/LocationScreen.dart';
 import 'package:wp_app/Screens/LoginScreen.dart';
 import 'package:wp_app/Screens/SignUpScreen.dart';
 import 'package:wp_app/Screens/WebScreen.dart';
@@ -24,7 +23,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => Loginscreen(),
         '/web': (context) => Webscreen(),
-        '/geo': (context) => Locationscreen(),
         '/signup': (context) => Signupscreen(),
       },
     );
