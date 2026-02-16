@@ -3,7 +3,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import '../Services/AuthService.dart';
 import '../Services/LocationService.dart';
+import '../Util/LoginResponse.dart';
 import '../Widgets/Neumorfic_widget.dart';
 import '../api_urls.dart';
 import 'package:wp_app/colors.dart';
@@ -26,42 +28,25 @@ class _LoginscreenState extends State<Loginscreen> {
   StreamSubscription<Position>? _positionSubscription;
   Position? _currentPosition;
   Timer? positionTimer;
+  var token = "";
+  var url = "";
 
-  late var token = "";
-  late var url = "";
+  void postDataloginprova(String user, String pass, BuildContext context) async {
+    AuthService autenticate = new AuthService();
+    LoginResponse? result = await autenticate.loginUser(user, pass);
 
-  void postData(String user, String pass, BuildContext context) async {
-    var dio = Dio();
-
-    try {
-      Response response = await dio.post(url_login, data: {
-        "username": user,
-        "password": pass
-      });
-
-      if (response.statusCode == 200) {
-        setState(() => _error_login = false);
-        final String urlOttenuta = response.data['url'];
-
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, '/web', arguments: {'url': urlOttenuta});
-        }
+    if (result != null){
+      token = result.token;
+      url = result.redirectUrl;
+      print("Token ottenuto: $token");
+      print("URL ottenuto: $url");
+      setState(() => _error_login = false);
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/web', arguments: {'url': result.redirectUrl+token});
       }
-    } on DioException catch (e) {
-      setState(() => _error_login = true);
-
-      String messaggio = "Errore di connessione";
-      if (e.response?.statusCode == 401) {
-        messaggio = "Username o Password errati";
-      }
-
-      //if (context.mounted) {
-      //  ScaffoldMessenger.of(context).showSnackBar(
-      //    SnackBar(content: Text(messaggio), backgroundColor: Colors.redAccent),
-      //  );
-      //}
-    } catch (e) {
-      setState(() => _error_login = true);
+    }
+    else {
+      print("Token ottenuto: $token");
     }
   }
 
@@ -302,7 +287,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
                     if (user.isNotEmpty && pass.isNotEmpty) {
-                      postData(user, pass, context);
+                      postDataloginprova(user, pass, context);
                     }
                   },
                   child: const Center(

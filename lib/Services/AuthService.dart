@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:wp_app/Util/LoginResponse.dart';
 import 'package:wp_app/api_urls.dart';
 
 class AuthService {
@@ -36,5 +37,21 @@ class AuthService {
       }
     }
     return false;
+  }
+
+  Future<LoginResponse?> loginUser(String username, String password) async {
+    try {
+      final response = await _dio.post(
+        'api/login',
+        data: {'username': username, 'password': password},
+      );
+
+      if (response.statusCode == 200) {
+        return LoginResponse.fromJson(response.data);
+      }
+    } on DioException catch (e) {
+      print("Errore API: ${e.response?.data}");
+    }
+    return null;
   }
 }
