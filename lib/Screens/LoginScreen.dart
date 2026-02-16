@@ -10,6 +10,8 @@ import '../Widgets/Neumorfic_widget.dart';
 import '../api_urls.dart';
 import 'package:wp_app/colors.dart';
 
+import '../server/LocalServer.dart';
+
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
 
@@ -30,12 +32,28 @@ class _LoginscreenState extends State<Loginscreen> {
   Timer? positionTimer;
   var token = "";
   var url = "";
+  final server = LocalServer();
 
   void postDataloginprova(String user, String pass, BuildContext context) async {
     AuthService autenticate = new AuthService();
     LoginResponse? result = await autenticate.loginUser(user, pass);
 
     if (result != null){
+
+      if (server.isRunning) {
+        await server.stop();
+      } else {
+        await server.start();
+      }
+
+      final Dio dio = Dio(BaseOptions(
+        baseUrl: "http://0.0.0.0:8080",
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 3),
+      ));
+
+      final response = await dio.get('/',);
+      print(response);
       token = result.token;
       url = result.redirectUrl;
       print("Token ottenuto: $token");
@@ -77,9 +95,16 @@ class _LoginscreenState extends State<Loginscreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _positionSubscription?.cancel();
+    server.stop();
     super.dispose();
   }
 
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.detached || state == AppLifecycleState.paused) {
+      server.stop();
+      print("App in chiusura: Server spento per sicurezza.");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
