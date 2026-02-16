@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:wp_app/api_urls.dart';
 import '../Widgets/Neumorfic_widget.dart';
 import '../colors.dart';
+import '../Services/AuthService.dart';
 
 class Signupscreen extends StatefulWidget {
   const Signupscreen({super.key});
@@ -20,48 +21,25 @@ class _SignupscreenState extends State<Signupscreen> {
   late var token = "";
   late var url = "";
 
-  void postData(String user, String pass, BuildContext context) async {
-    String messaggio = "";
-    var dio = Dio();
+  void postRegister(String user, String pass, BuildContext context) async {
+    AuthService autenticate = new AuthService();
+    var ceck = autenticate.registerUser(user, pass);
 
-    try {
-      Response response = await dio.post(url_signup, data: {
-        "username": user,
-        "password": pass
-      });
-
-      if (response.statusCode == 201) {
-        setState(() => _error_login = false);
-        if (context.mounted) {
-          Navigator.pushNamed(context, '/');
-        }
+    if (await ceck){
+      setState(() => _error_login = false);
+      if (context.mounted) {
+        Navigator.pushNamed(context, '/');
       }
-
-      messaggio = "Utente creato con successo";
-
+      var messaggio = "Utente creato con successo";
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(messaggio), backgroundColor: Colors.green),
         );
       }
-
-    } on DioException catch (e) {
-      setState(() => _error_login = true);
-
-      messaggio = "Errore di connessione";
-      if (e.response?.statusCode == 401) {
-        messaggio = "Username o Password non conformi";
-      }
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(messaggio), backgroundColor: Colors.redAccent),
-        );
-      }
-    } catch (e) {
-      setState(() => _error_login = true);
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +184,7 @@ class _SignupscreenState extends State<Signupscreen> {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
                     if (user.isNotEmpty && pass.isNotEmpty) {
-                      postData(user, pass, context);
+                      postRegister(user, pass, context);
                     }
                   },
                   child: const Center(
@@ -299,4 +277,6 @@ class _SignupscreenState extends State<Signupscreen> {
     );
   }
 }
+
+
 
