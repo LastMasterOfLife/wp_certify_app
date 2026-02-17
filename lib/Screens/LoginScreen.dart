@@ -35,36 +35,36 @@ class _LoginscreenState extends State<Loginscreen> {
   final server = LocalServer();
 
   void postDataloginprova(String user, String pass, BuildContext context) async {
-    AuthService autenticate = new AuthService();
+    AuthService autenticate = AuthService();
+
     LoginResponse? result = await autenticate.loginUser(user, pass);
 
-    if (result != null){
-
-      if (server.isRunning) {
-        await server.stop();
-      } else {
-        await server.start();
-      }
-
-      final Dio dio = Dio(BaseOptions(
-        baseUrl: "http://0.0.0.0:8080",
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 3),
-      ));
-
-      final response = await dio.get('/',);
-      print(response);
+    if (result != null) {
       token = result.token;
-      url = result.redirectUrl;
       print("Token ottenuto: $token");
-      print("URL ottenuto: $url");
+
+      //String? webviewUrl = await autenticate.getWebviewUrl(token);
+
+      //if (webviewUrl == null) {
+      //  print("Errore: impossibile ottenere l'URL WebView");
+       // setState(() => _error_login = true);
+        //return;
+      //}
+
+      //print("URL WebView ottenuto: $webviewUrl");
+
       setState(() => _error_login = false);
+
       if (context.mounted) {
-        Navigator.pushReplacementNamed(context, '/web', arguments: {'url': result.redirectUrl+token});
+        Navigator.pushReplacementNamed(
+          context,
+          '/web',
+          arguments: {'url': "http://10.0.2.2:8000/auth/webview-login?Token=$token"},
+        );
       }
-    }
-    else {
-      print("Token ottenuto: $token");
+    } else {
+      print("Login fallito, token non ottenuto");
+      setState(() => _error_login = true);
     }
   }
 
@@ -76,7 +76,7 @@ class _LoginscreenState extends State<Loginscreen> {
 
       Position? position = await Geolocator.getLastKnownPosition();
 
-      positionTimer = Timer.periodic(Duration(milliseconds: 1000), (timer) {
+      positionTimer = Timer.periodic(Duration(seconds: 20), (timer) {
         print("timer -> Lat: ${position!.latitude}, Lon: ${position
             .longitude}, alt: ${position.altitude}, accuracy: ${position
             .accuracy}");
