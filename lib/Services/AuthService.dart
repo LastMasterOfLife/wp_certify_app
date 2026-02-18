@@ -63,4 +63,29 @@ class AuthService {
     }
     return null;
   }
+
+  ///
+  /// Funzione per l'aggiunta di un'immagine al server
+  ///
+  Future<String> addImage(String imagePath) async {
+    try {
+      final response = await _dio.post(
+        'api/images',
+        data: FormData.fromMap({
+          'image': await MultipartFile.fromFile(imagePath, filename: 'upload.jpg'),
+        }),
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return "Immagine caricata con successo!";
+      }
+    } on DioException catch (e) {
+      print("Errore API: ${e.response?.data}");
+      return "Errore durante il caricamento dell'immagine.";
+    }
+    return "Errore sconosciuto.";
+  }
 }

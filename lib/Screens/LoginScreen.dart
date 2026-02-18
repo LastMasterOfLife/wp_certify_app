@@ -57,8 +57,8 @@ class _LoginscreenState extends State<Loginscreen> {
       if (context.mounted) {
         Navigator.pushReplacementNamed(
           context,
-          '/web',
-          arguments: {'url': "$url?Token=$token"},
+          '/container',
+          arguments: {'url': "$url?Token=$token"}
         );
       }
     } else {

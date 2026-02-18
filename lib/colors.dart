@@ -10,3 +10,6 @@ const header_color = Color(0xFF7C8DB5);
 const hint_text_color = Color(0xFFADB5C7);
 const imput_border = Color(0xFF9BA4B4);
 const apple_social_color = Color(0xFF000000);
+const primary_color = Color(0xFF29ABB8);
+const secondary_color = Color(0xFF9E9E9E);
+const terziary_color = Color(0xFF1F1E1E);

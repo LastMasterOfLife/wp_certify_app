@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:wp_app/Screens/CameraScreen.dart';
+import 'package:wp_app/Screens/ContainerScreen.dart';
 import 'package:wp_app/Screens/LoginScreen.dart';
 import 'package:wp_app/Screens/RegisterScreen.dart';
+import 'package:wp_app/Screens/SettingsScreen.dart';
 import 'package:wp_app/Screens/WebScreen.dart';
 
 void main() {
@@ -22,8 +25,11 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => Loginscreen(),
-        '/web': (context) => Webscreen(),
+        '/container': (context) => Containerscreen(),
+        '/web': (context) => Webscreen(loadUrl: 'https://google.com',),
         '/signup': (context) => Registerscreen(),
+        '/camera': (context) => CameraScreen(url: 'https://google.com',),
+        '/settings': (context) => Settingsscreen(),
       },
     );
   }
