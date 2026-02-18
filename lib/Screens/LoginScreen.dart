@@ -43,18 +43,22 @@ class _LoginscreenState extends State<Loginscreen> {
   ///
   /// Funzione per eseguire il login con autenticazione.
   ///
+  /// Url di esempio per redirect : http://10.0.2.2:8000/auth/webview-login?Token=$token
+  ///
   void loginUser(String user, String pass, BuildContext context) async {
     AuthService autenticate = AuthService();
     LoginResponse? result = await autenticate.getToken(user, pass);
     if (result != null) {
       token = result.token;
+      url = result.redirectUrl;
       print("Token ottenuto: $token");
+      print("Url redirect ottenuto: $url");
       setState(() => _errorLogin = false);
       if (context.mounted) {
         Navigator.pushReplacementNamed(
           context,
           '/web',
-          arguments: {'url': "http://10.0.2.2:8000/auth/webview-login?Token=$token"},
+          arguments: {'url': "$url?Token=$token"},
         );
       }
     } else {
