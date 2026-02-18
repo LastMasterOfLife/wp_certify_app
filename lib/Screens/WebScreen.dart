@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 
+///
+/// Schermata che mostra una Web
+///
 class Webscreen extends StatefulWidget {
   const Webscreen({super.key});
 
@@ -9,6 +12,9 @@ class Webscreen extends StatefulWidget {
   State<Webscreen> createState() => _WebscreenState();
 }
 
+///
+/// _controller viene usato per gestire e mostrare la pagina web
+///
 class _WebscreenState extends State<Webscreen> {
 
   late final WebViewController _controller;
@@ -19,18 +25,12 @@ class _WebscreenState extends State<Webscreen> {
     super.didChangeDependencies();
 
     if (!_isInitialized) {
-      final Map<String, dynamic> args =
-      ModalRoute
-          .of(context)!
-          .settings
-          .arguments as Map<String, dynamic>;
-
-
-      final String urlDaCaricare = args['url'] ?? 'https://www.google.com';
+      final Map<String, dynamic> args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+      final String loadUrl = args['url'] ?? 'https://www.google.com';
 
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..loadRequest(Uri.parse(urlDaCaricare));
+        ..loadRequest(Uri.parse(loadUrl));
 
       _isInitialized = true;
     }

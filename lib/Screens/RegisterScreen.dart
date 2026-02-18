@@ -1,32 +1,41 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:wp_app/api_urls.dart';
-import '../Widgets/Neumorfic_widget.dart';
+import '../Widgets/neumorficWidget.dart';
 import '../colors.dart';
 import '../Services/AuthService.dart';
 
-class Signupscreen extends StatefulWidget {
-  const Signupscreen({super.key});
+
+
+///
+/// Schermata di registrazione dell'utente
+///
+class Registerscreen extends StatefulWidget {
+  const Registerscreen({super.key});
 
   @override
-  State<Signupscreen> createState() => _SignupscreenState();
+  State<Registerscreen> createState() => _RegisterscreenState();
 }
 
-class _SignupscreenState extends State<Signupscreen> {
+///
+/// _usernameController e _passwordController vengono uasti per ottenere l'imput dell'utente
+///
+/// _obscurePassword viene usato per mostrare o nascondere la password inserita.
+///
+class _RegisterscreenState extends State<Registerscreen> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _error_login = false;
   late var token = "";
   late var url = "";
 
-  void postRegister(String user, String pass, BuildContext context) async {
+
+  ///
+  /// Funzione per la registrazione dell'utente
+  ///
+  void registerUser(String user, String pass, BuildContext context) async {
     AuthService autenticate = new AuthService();
     var ceck = autenticate.registerUser(user, pass);
-
     if (await ceck){
-      setState(() => _error_login = false);
       if (context.mounted) {
         Navigator.pushNamed(context, '/');
       }
@@ -38,8 +47,6 @@ class _SignupscreenState extends State<Signupscreen> {
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +191,7 @@ class _SignupscreenState extends State<Signupscreen> {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
                     if (user.isNotEmpty && pass.isNotEmpty) {
-                      postRegister(user, pass, context);
+                      registerUser(user, pass, context);
                     }
                   },
                   child: const Center(

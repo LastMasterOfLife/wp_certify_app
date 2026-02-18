@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wp_app/Screens/LoginScreen.dart';
-import 'package:wp_app/Screens/SignUpScreen.dart';
+import 'package:wp_app/Screens/RegisterScreen.dart';
 import 'package:wp_app/Screens/WebScreen.dart';
 
 void main() {
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => Loginscreen(),
         '/web': (context) => Webscreen(),
-        '/signup': (context) => Signupscreen(),
+        '/signup': (context) => Registerscreen(),
       },
     );
   }

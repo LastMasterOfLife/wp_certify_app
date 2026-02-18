@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+///
+/// Lista dei colori usati nell'app
+///
+
 const background_color = Color(0xFFECF0F3);
 const shadow_color = Color(0xFFD1D9E6);
 const header_color = Color(0xFF7C8DB5);

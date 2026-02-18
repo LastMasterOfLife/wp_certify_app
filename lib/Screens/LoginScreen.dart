@@ -1,17 +1,16 @@
 import 'dart:async';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../Services/AuthService.dart';
 import '../Services/LocationService.dart';
 import '../Util/LoginResponse.dart';
-import '../Widgets/Neumorfic_widget.dart';
-import '../api_urls.dart';
+import '../Widgets/neumorficWidget.dart';
 import 'package:wp_app/colors.dart';
 
-import '../server/LocalServer.dart';
 
+///
+/// Schemata di Login per l'utente già registrato
+///
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
 
@@ -19,42 +18,38 @@ class Loginscreen extends StatefulWidget {
   State<Loginscreen> createState() => _LoginscreenState();
 }
 
+///
+/// _usernameController e _passwordController vengono uasti per ottenere l'imput dell'utente
+///
+/// _obscurePassword viene usato per mostrare o nascondere la password inserita.
+///
+/// _positionSubscription viene usato per consentire lo stop del servizio di geolocalizzazione al chiudere l'app
+///
+/// positionTimer viene usato per ottenere l'utlima posizione (lat, long) conosciuta
+///
 class _LoginscreenState extends State<Loginscreen> {
 
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = false;
-  String _locationMessage = "Posizione non rilevata";
-  bool _error_login = false;
+  bool _errorLogin = false;
   StreamSubscription<Position>? _positionSubscription;
-  Position? _currentPosition;
   Timer? positionTimer;
   var token = "";
   var url = "";
-  final server = LocalServer();
 
-  void postDataloginprova(String user, String pass, BuildContext context) async {
+
+  ///
+  /// Funzione per eseguire il login con autenticazione.
+  ///
+  void loginUser(String user, String pass, BuildContext context) async {
     AuthService autenticate = AuthService();
-
-    LoginResponse? result = await autenticate.loginUser(user, pass);
-
+    LoginResponse? result = await autenticate.getToken(user, pass);
     if (result != null) {
       token = result.token;
       print("Token ottenuto: $token");
-
-      //String? webviewUrl = await autenticate.getWebviewUrl(token);
-
-      //if (webviewUrl == null) {
-      //  print("Errore: impossibile ottenere l'URL WebView");
-       // setState(() => _error_login = true);
-        //return;
-      //}
-
-      //print("URL WebView ottenuto: $webviewUrl");
-
-      setState(() => _error_login = false);
-
+      setState(() => _errorLogin = false);
       if (context.mounted) {
         Navigator.pushReplacementNamed(
           context,
@@ -64,18 +59,17 @@ class _LoginscreenState extends State<Loginscreen> {
       }
     } else {
       print("Login fallito, token non ottenuto");
-      setState(() => _error_login = true);
+      setState(() => _errorLogin = true);
     }
   }
 
+  ///
+  /// Funzione per ottenere l'ultima posizione rilevata in modo continuo
+  ///
   void _startListening() async {
-
     bool hasPermission = await LocationService().checkPermissions();
-
     if (hasPermission) {
-
       Position? position = await Geolocator.getLastKnownPosition();
-
       positionTimer = Timer.periodic(Duration(seconds: 20), (timer) {
         print("timer -> Lat: ${position!.latitude}, Lon: ${position
             .longitude}, alt: ${position.altitude}, accuracy: ${position
@@ -95,15 +89,7 @@ class _LoginscreenState extends State<Loginscreen> {
     _usernameController.dispose();
     _passwordController.dispose();
     _positionSubscription?.cancel();
-    server.stop();
     super.dispose();
-  }
-
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.detached || state == AppLifecycleState.paused) {
-      server.stop();
-      print("App in chiusura: Server spento per sicurezza.");
-    }
   }
 
   @override
@@ -239,7 +225,7 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
 
-                if (_error_login)
+                if (_errorLogin)
                   const Padding(
                     padding: EdgeInsets.only(top: 8.0, left: 8.0),
                     child: Text(
@@ -312,7 +298,7 @@ class _LoginscreenState extends State<Loginscreen> {
                     String user = _usernameController.text.trim();
                     String pass = _passwordController.text.trim();
                     if (user.isNotEmpty && pass.isNotEmpty) {
-                      postDataloginprova(user, pass, context);
+                      loginUser(user, pass, context);
                     }
                   },
                   child: const Center(
