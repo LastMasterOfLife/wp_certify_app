@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import '../Services/AuthService.dart';
@@ -12,7 +13,8 @@ import 'package:wp_app/colors.dart';
 /// Schemata di Login per l'utente già registrato
 ///
 class Loginscreen extends StatefulWidget {
-  const Loginscreen({super.key});
+  final String redirectTo;
+  const Loginscreen({super.key, required this.redirectTo});
 
   @override
   State<Loginscreen> createState() => _LoginscreenState();
@@ -54,12 +56,23 @@ class _LoginscreenState extends State<Loginscreen> {
       print("Token ottenuto: $token");
       print("Url redirect ottenuto: $url");
       setState(() => _errorLogin = false);
-      if (context.mounted) {
-        Navigator.pushReplacementNamed(
-          context,
-          '/container',
-          arguments: {'url': "$url?Token=$token"}
-        );
+      if (widget.redirectTo == ""){
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(
+              context,
+              '/container',
+              arguments: {'url': "$url?Token=$token"}
+          );
+        }
+      }
+      else {
+        if (context.mounted) {
+          Navigator.pushReplacementNamed(
+              context,
+              '/container',
+              arguments: {'url': "$url?Token=$token", 'initialTab': widget.redirectTo}
+          );
+        }
       }
     } else {
       print("Login fallito, token non ottenuto");
@@ -87,6 +100,7 @@ class _LoginscreenState extends State<Loginscreen> {
     _startListening();
     super.initState();
   }
+
 
   @override
   void dispose() {

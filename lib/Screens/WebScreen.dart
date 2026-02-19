@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-
-///
-/// Schermata che mostra una Web
-///
 class Webscreen extends StatefulWidget {
   final String loadUrl;
   const Webscreen({super.key, required this.loadUrl});
@@ -13,34 +9,68 @@ class Webscreen extends StatefulWidget {
   State<Webscreen> createState() => _WebscreenState();
 }
 
-///
-/// _controller viene usato per gestire e mostrare la pagina web
-///
 class _WebscreenState extends State<Webscreen> {
 
   late final WebViewController _controller;
   bool _isInitialized = false;
-
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     if (!_isInitialized) {
-      //final Map<String, dynamic> args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-      //final String loadUrl = args['url'] ?? 'https://www.google.com';
-
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onNavigationRequest: (NavigationRequest request) {
+              final url = request.url;
+
+              if (url.startsWith('myapp://')) {
+                final uri = Uri.parse(url);
+
+                // myapp://open/camera → apri tab camera
+                if (uri.host == 'open') {
+                  final path = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
+
+                  String initialTab;
+                  switch (path) {
+                    case 'camera':
+                      initialTab = '/camera';
+                      break;
+                    case 'settings':
+                      initialTab = '/settings';
+                      break;
+                    default:
+                      initialTab = '/web';
+                  }
+
+                  // Naviga al container con il tab corretto
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      '/container',
+                      arguments: {
+                        'url': widget.loadUrl,
+                        'initialTab': initialTab,
+                      },
+                    );
+                  });
+                }
+
+                // Blocca la WebView dal navigare verso myapp://
+                return NavigationDecision.prevent;
+              }
+
+              // Tutti gli altri URL navigano normalmente
+              return NavigationDecision.navigate;
+            },
+          ),
+        )
         ..loadRequest(Uri.parse(widget.loadUrl));
 
       _isInitialized = true;
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override

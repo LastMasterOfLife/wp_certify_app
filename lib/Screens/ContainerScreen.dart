@@ -6,6 +6,7 @@ import 'package:wp_app/Screens/WebScreen.dart';
 import '../colors.dart';
 
 class Containerscreen extends StatefulWidget {
+
   const Containerscreen({super.key});
 
   @override
@@ -13,7 +14,38 @@ class Containerscreen extends StatefulWidget {
 }
 
 class _ContainerscreenState extends State<Containerscreen> {
-  int _selectedIndex = 1;
+  late int _selectedIndex;
+  late String _loadUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = 1; // default
+  }
+
+  // Gli arguments di ModalRoute non sono disponibili in initState,
+  // quindi usiamo didChangeDependencies che viene chiamato subito dopo
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    _loadUrl = args?['url'] ?? 'https://www.google.com';
+    final String tabRedirect = args?['initialTab'] ?? 'home';
+
+    switch (tabRedirect) {
+      case '/camera':
+        _selectedIndex = 0;
+        break;
+      case '/web':
+        _selectedIndex = 1;
+        break;
+      case '/settings':
+        _selectedIndex = 2;
+        break;
+      default:
+        _selectedIndex = 1;
+    }
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -23,12 +55,9 @@ class _ContainerscreenState extends State<Containerscreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final String loadUrl = args?['url'] ?? 'https://www.google.com';
-
     final List<Widget> pages = [
-      CameraScreen(url: loadUrl,),
-      Webscreen(loadUrl: loadUrl),
+      CameraScreen(url: _loadUrl),
+      Webscreen(loadUrl: _loadUrl),
       Settingsscreen(),
     ];
 
