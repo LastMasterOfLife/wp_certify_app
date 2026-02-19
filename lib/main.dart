@@ -7,6 +7,8 @@ import 'package:wp_app/Screens/RegisterScreen.dart';
 import 'package:wp_app/Screens/SettingsScreen.dart';
 import 'package:wp_app/Screens/WebScreen.dart';
 
+import 'Services/ConnectionService.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -26,6 +28,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    ConnectionService().initialize();
     _handleInitialLink();
     _handleIncomingLinks();
   }

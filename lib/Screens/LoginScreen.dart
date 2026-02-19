@@ -2,8 +2,11 @@ import 'dart:async';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:wp_app/Services/DatabaseService.dart';
 import '../Services/AuthService.dart';
+import '../Services/ConnectionService.dart';
 import '../Services/LocationService.dart';
+import '../Util/LocationModel.dart';
 import '../Util/LoginResponse.dart';
 import '../Widgets/neumorficWidget.dart';
 import 'package:wp_app/colors.dart';
@@ -88,11 +91,36 @@ class _LoginscreenState extends State<Loginscreen> {
     if (hasPermission) {
       Position? position = await Geolocator.getLastKnownPosition();
       positionTimer = Timer.periodic(Duration(seconds: 20), (timer) {
-        print("timer -> Lat: ${position!.latitude}, Lon: ${position
-            .longitude}, alt: ${position.altitude}, accuracy: ${position
-            .accuracy}");
+        print("timer -> Lat: ${position!.latitude}, Lon: ${position.longitude}, alt: ${position.altitude}, accuracy: ${position.accuracy}");
+        savePosition(position.latitude, position.longitude);
       });
     }
+  }
+
+  Future<bool> getStatusConnection() async {
+    if (ConnectionService().hasConnection) {
+      // Invia al server
+      return true;
+    } else {
+      // Salva solo su SQLite interno
+      return false;
+    }
+
+  }
+
+
+
+  Future<void> savePosition(double lat, double long) async {
+
+    final newLocation = LocationModel(
+        latitude: lat,
+        longitude: long,
+        isOnline: await getStatusConnection() // false indica che è una posizione offline, true per online
+    );
+
+    // Inserimento nel database
+    await DatabaseService.instance.insertLocation(newLocation);
+    print("Posizione salvata!");
   }
 
   @override

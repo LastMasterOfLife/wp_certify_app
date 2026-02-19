@@ -21,6 +21,7 @@ class _WebscreenState extends State<Webscreen> {
     if (!_isInitialized) {
       _controller = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setUserAgent('FlutterWebView/wp_app')
         ..setNavigationDelegate(
           NavigationDelegate(
             onNavigationRequest: (NavigationRequest request) {
@@ -29,7 +30,6 @@ class _WebscreenState extends State<Webscreen> {
               if (url.startsWith('myapp://')) {
                 final uri = Uri.parse(url);
 
-                // myapp://open/camera → apri tab camera
                 if (uri.host == 'open') {
                   final path = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : '';
 
@@ -45,7 +45,6 @@ class _WebscreenState extends State<Webscreen> {
                       initialTab = '/web';
                   }
 
-                  // Naviga al container con il tab corretto
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Navigator.pushReplacementNamed(
                       context,
