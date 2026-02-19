@@ -69,17 +69,22 @@ class AuthService {
   ///
   Future<String> addImage(String imagePath) async {
     try {
+      FormData formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(
+          imagePath,
+          filename: 'upload.jpg',
+        ),
+      });
+
       final response = await _dio.post(
         'api/images',
-        data: FormData.fromMap({
-          'image': await MultipartFile.fromFile(imagePath, filename: 'upload.jpg'),
-        }),
+        data: formData,
         options: Options(
           contentType: 'multipart/form-data',
         ),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return "Immagine caricata con successo!";
       }
     } on DioException catch (e) {
