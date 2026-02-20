@@ -120,6 +120,8 @@ class _LoginscreenState extends State<Loginscreen> {
 
     // Inserimento nel database
     await DatabaseService.instance.insertLocation(newLocation);
+    await DatabaseService.instance.printAllLocations();
+    await DatabaseService.instance.syncOfflineLocations();
     print("Posizione salvata!");
   }
 

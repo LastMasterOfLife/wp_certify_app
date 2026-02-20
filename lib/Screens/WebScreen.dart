@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+///
+/// Schermata per visualizzare la WebView e gestire la comunicazione tra WebView e Flutter
+///
 class Webscreen extends StatefulWidget {
   final String loadUrl;
   const Webscreen({super.key, required this.loadUrl});
@@ -11,6 +14,7 @@ class Webscreen extends StatefulWidget {
 
 class _WebscreenState extends State<Webscreen> {
 
+  String schemaDeepLink = 'myapp://';
   late final WebViewController _controller;
   bool _isInitialized = false;
 
@@ -27,7 +31,7 @@ class _WebscreenState extends State<Webscreen> {
             onNavigationRequest: (NavigationRequest request) {
               final url = request.url;
 
-              if (url.startsWith('myapp://')) {
+              if (url.startsWith(schemaDeepLink)) {
                 final uri = Uri.parse(url);
 
                 if (uri.host == 'open') {

@@ -34,6 +34,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- Da cambiare myapp con il dominio https per produzione. -->
                 <data
                     android:scheme="myapp"
                     android:host="open" />
